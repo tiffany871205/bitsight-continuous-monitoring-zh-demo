@@ -1,13 +1,20 @@
 const spmMenu=[
  ['儀表板','spm-dashboard','⌁'],
- ['組織',null,'⌘',[['公司管理','spm-organization'],['評等樹','spm-rating-tree'],['基礎設施設定','spm-infrastructure-config']]],
- ['發現事項',null,'▣',[['全部發現事項','spm-findings'],['風險面向','spm-risk-vectors'],['弱點偵測','spm-threat-detection']]],
- ['攻擊面',null,'◎',[['攻擊面總覽','spm-attack-surface'],['基礎設施','spm-assets'],['數位足跡','spm-digital-footprint']]],
- ['行動計畫',null,'✓',[['行動計畫','spm-action-plans'],['改善追蹤','spm-remediation']]],
- ['同業比較','spm-peer','♙'],['協作','spm-collaboration','✉'],
- ['警示',null,'⚑',[['警示','spm-alerts'],['警示設定','spm-alert-settings']]],
+ ['組織',null,'⌘',[
+  ['公司詳細資料','spm-company-details'],['風險面向','spm-risk-vectors'],['評等樹','spm-rating-tree'],['我的公司清單','spm-company-list'],['子公司','spm-subsidiaries'],['評估','spm-assessments'],['資料外洩情報','spm-breach-intelligence'],['Bitsight 徽章','spm-badge']]],
+ ['發現事項',null,'▣',[
+  ['發現事項表格','spm-findings'],['問題追蹤','spm-remediation'],['弱點偵測','spm-threat-detection']]],
+ ['攻擊面',null,'◎',[
+  ['基礎設施','spm-assets'],['攻擊面分析','spm-attack-surface'],['居家辦公','spm-work-from-home'],['雲端基礎設施同步','spm-cloud-infrastructure'],['可能的基礎設施','spm-probable-infrastructure'],['第三方資產','spm-third-party-assets']]],
+ ['行動計畫',null,'✓',[
+  ['風險改善','spm-action-plans'],['評等預測','spm-forecasting'],['子公司改善','spm-subsidiary-improvement'],['控制措施洞察','spm-control-insights']]],
+ ['同業比較',null,'♙',[
+  ['同業分析','spm-peer'],['風險位置','spm-risk-position']]],
+ ['協作','spm-collaboration','✉'],
+ ['警示',null,'⚑',[
+  ['已設定警示','spm-alert-settings'],['警示記錄','spm-alerts'],['感染事件','spm-infections']]],
  ['報表','spm-reports','▤'],['整合','spm-integrations','♧']
-];
+]
 const spmNames=Object.fromEntries(spmMenu.flatMap(m=>m[3]?m[3].map(x=>[x[1],x[0]]):[[m[1],m[0]]]));
 function isSpm(){return state.page.startsWith('spm-')}
 function spmParent(page){return spmMenu.find(m=>m[3]?.some(x=>x[1]===page))?.[0]||''}
@@ -26,7 +33,7 @@ const spmCards=()=>`<div class="spm-grid">
 </div>`;
 function spmDashboard(){const stories=['Acronis 備份外掛程式權限提升弱點遭實際利用','Cisco ISE 驗證繞過弱點遭實際利用','GitLab 路徑穿越可任意讀取檔案'];return `${pagebar('我的公司儀表板','<button class="outline" data-modal="add-card">新增卡片</button><button class="outline" data-modal="edit-dashboard">編輯儀表板</button>')}<div class="content spm-page"><section class="panel spm-updates"><header>最新更新 <button data-toggle="updates">隱藏　⌃</button></header><div id="updates" class="spm-update-grid"><article><h2>△　10 項新興資安事件</h2><hr><h3>${stories[state.update]}</h3><div class="meta"><span><b>嚴重程度</b><br>CVSS 7.8</span><span><b>DVE 分數</b><br>10</span></div><h4>說明</h4><p>這項高嚴重性弱點可能讓低權限攻擊者提升權限並執行任意程式碼。建議立即確認暴露資產並套用修補程式。</p><div class="advisories">▮ 供應商公告　　▮ CISA 公告</div><div class="update-foot"><button data-update="prev">←</button><span>${state.update+1} / 3</span><button data-nav="spm-threat-detection">檢視弱點偵測</button><button data-update="next">→</button></div></article><aside><h3>威脅情報新聞　<em>pulse</em></h3><hr><h3>新型惡意程式提供遠端桌面、竊密與錢包注入功能</h3><p>近期威脅情報摘要，協助資安團隊快速理解外部威脅與可能影響。</p><button data-toast="已開啟威脅情報摘要">繼續閱讀</button><footer>←　1 / 4　→</footer></aside></div></section>${spmCards()}</div>`}
 function spmGeneric(){const cfg={
- 'spm-organization':['公司管理',['公司','安全評等','評等變化','標籤','主要公司'],[['Saperix, Inc.','420','−20','主要公司','是'],['Saperix Corporate','690','+10','業務單位','否'],['Awesome Inc','640','−10','子公司','否']]],
+ 'spm-company-details':['公司詳細資料',['公司','安全評等','評等變化','標籤','主要公司'],[['Saperix, Inc.','420','−20','主要公司','是'],['Saperix Corporate','690','+10','業務單位','否'],['Awesome Inc','640','−10','子公司','否']]],
  'spm-findings':['全部發現事項',['發現事項','公司','嚴重程度','最近發現','狀態'],[['過期 SSL 憑證','Saperix, Inc.','重大','2026/09/20','待處理'],['開放遠端管理連接埠','Awesome Inc','高','2026/09/19','調查中'],['DKIM 設定不完整','Saperix Corporate','中','2026/09/18','已指派']]],
  'spm-attack-surface':['攻擊面總覽',['資產','類型','公司','暴露狀態','最近觀察'],[['portal.example.com','網域','Saperix, Inc.','外部可見','今天'],['203.0.113.18','IP 位址','Awesome Inc','需檢視','昨天'],['Azure East Asia','雲端資產','Saperix Corporate','已確認','3 天前']]],
  'spm-action-plans':['行動計畫',['計畫','公司','負責人','到期日','進度'],[['修補外部弱點','Saperix, Inc.','資安團隊','2026/09/30','65%'],['強化郵件安全','Awesome Inc','IT 團隊','2026/10/05','30%']]],
@@ -42,5 +49,19 @@ function spmGeneric(){const cfg={
  'spm-assets':['基礎設施',['資產','資產類型','歸屬公司','來源','狀態'],[['portal.saperix.example','網域','Saperix, Inc.','DNS 探索','已確認'],['203.0.113.18','IPv4','Awesome Inc','掃描','需確認'],['mail.saperix.example','主機','Saperix Corporate','憑證','已確認']]],
  'spm-digital-footprint':['數位足跡',['數位資產','技術／服務','首次發現','風險','歸屬'],[['login.saperix.example','Microsoft IIS','2026/05/11','中','Saperix, Inc.'],['shop.saperix.example','Adobe Commerce','2026/07/08','高','待確認'],['api.saperix.example','NGINX','2026/08/16','低','Saperix Corporate']]],
  'spm-remediation':['改善追蹤',['改善事項','關聯發現','公司','目標日期','狀態'],[['更新 Acronis 外掛程式','CVE-2026-87886','Saperix, Inc.','2026/09/24','進行中'],['停用舊版 TLS','TLS 設定','Awesome Inc','2026/09/28','已指派'],['部署 DNSSEC','DNS 安全','Saperix Corporate','2026/10/10','規劃中']]],
+ 'spm-company-list':['我的公司清單',['公司','安全評等','關係','標籤','狀態'],[['Saperix, Inc.','420','主要公司','主要評等','監控中'],['Saperix Corporate','690','子公司','Azure','監控中'],['Awesome Inc','640','關聯公司','測試','監控中']]],
+ 'spm-subsidiaries':['子公司',['子公司','安全評等','評等變化','改善計畫','狀態'],[['Saperix Corporate','690','+10','進行中','需關注'],['Saperix Lab','720','0','未建立','穩定']]],
+ 'spm-assessments':['評估',['評估名稱','公司','完成度','到期日','狀態'],[['年度資安評估','Saperix, Inc.','82%','2026/10/15','進行中'],['雲端控制評估','Saperix Corporate','100%','2026/09/10','已完成']]],
+ 'spm-breach-intelligence':['資料外洩情報',['事件','公司','日期','資料類型','狀態'],[['憑證外洩訊號','Awesome Inc','2026/09/12','帳號憑證','調查中'],['公開儲存桶','Saperix Corporate','2026/08/29','設定資訊','已處理']]],
+ 'spm-badge':['Bitsight 徽章',['徽章','適用公司','目前評等','有效期限','狀態'],[['Security Rating Badge','Saperix, Inc.','420','2027/09/01','可發布']]],
+ 'spm-work-from-home':['居家辦公',['來源網路','裝置數','暴露服務','風險等級','最近觀察'],[['遠端辦公網路 A','34','5','中','今天'],['遠端辦公網路 B','18','1','低','昨天']]],
+ 'spm-cloud-infrastructure':['雲端基礎設施同步',['雲端帳戶','平台','資產數','上次同步','狀態'],[['Saperix Production','Microsoft Azure','124','10 分鐘前','已連線'],['Saperix Lab','AWS','46','2 小時前','已連線']]],
+ 'spm-probable-infrastructure':['可能的基礎設施',['資產','判斷依據','可信度','建議歸屬','狀態'],[['198.51.100.24','共同憑證','高','Saperix, Inc.','待確認'],['lab-saperix.example','DNS 關聯','中','Saperix Lab','待確認']]],
+ 'spm-third-party-assets':['第三方資產',['資產','服務提供者','產品','公司','風險'],[['login.microsoftonline.com','Microsoft','Entra ID','Saperix, Inc.','低'],['saperix.service-now.com','ServiceNow','ITSM','Saperix Corporate','中']]],
+ 'spm-forecasting':['評等預測',['情境','目前評等','預測評等','預計變化','時間範圍'],[['修補重大弱點','420','510','+90','90 天'],['改善 TLS 設定','420','450','+30','30 天']]],
+ 'spm-subsidiary-improvement':['子公司改善',['子公司','目前評等','目標評等','改善項目','進度'],[['Saperix Corporate','690','740','4','50%'],['Saperix Lab','720','760','2','25%']]],
+ 'spm-control-insights':['控制措施洞察',['控制措施','涵蓋風險','成熟度','缺口','建議'],[['弱點管理','修補節奏','基礎','3','建立修補 SLA'],['外部資產管理','攻擊面','中階','2','確認未知資產']]],
+ 'spm-risk-position':['風險位置',['比較群組','本公司百分位','同業中位數','評等差距','狀態'],[['全球軟體業','18%','710','−290','低於同業'],['亞太科技業','22%','690','−270','低於同業']]],
+ 'spm-infections':['感染事件',['事件','資產','惡意程式','首次發現','狀態'],[['殭屍網路通訊','203.0.113.18','未知下載器','2026/09/18','調查中'],['垃圾郵件活動','mail.saperix.example','Spam bot','2026/09/12','已處理']]],
  'spm-alert-settings':['警示設定',['規則名稱','觸發條件','公司範圍','通知方式','狀態'],[['重大評等下降','下降 40 分以上','所有 SPM 公司','電子郵件','啟用'],['新的重大發現','重大／嚴重','主要公司','電子郵件、Webhook','啟用'],['基礎設施變更','新增外部資產','Saperix, Inc.','電子郵件','暫停']]]};
- const fallback=[spmNames[state.page]||'安全態勢管理',['項目','公司','類型','更新時間','狀態'],[['示範項目 A','Saperix, Inc.','資安資訊','今天','需檢視'],['示範項目 B','Awesome Inc','監控資訊','昨天','已確認']]];const [title,headers,rows]=cfg[state.page]||fallback;const summaries={'spm-organization':['3 家公司','420 主要評等','2 個組織節點'],'spm-findings':['1,063 項發現','155 項高優先','799 項屬於主要公司'],'spm-risk-vectors':['4 個風險面向','1 個改善中','2 個需優先處理'],'spm-threat-detection':['3 項重大弱點','9 個暴露資產','2 項遭實際利用'],'spm-attack-surface':['318 個資產','43 項近期變更','12 個需確認'],'spm-assets':['318 個資產','184 個網域','97 個 IP 位址'],'spm-digital-footprint':['246 個外部資產','17 項新發現','8 項高風險'],'spm-action-plans':['2 個行動計畫','6 個進行中工作','1 個即將到期'],'spm-remediation':['3 個改善事項','1 個進行中','0 個逾期'],'spm-peer':['第 18 百分位','同業中位數 710','評等差距 −290'],'spm-collaboration':['2 個待回覆','1 個進行中','0 個已逾期'],'spm-alerts':['3 個近期警示','2 個未讀','1 個已處理'],'spm-alert-settings':['2 個啟用規則','1 個暫停','2 種通知管道'],'spm-reports':['3 份報表','2 個排程','今天更新'],'spm-integrations':['1 個已連線','2 個可設定','10 分鐘前同步']}[state.page]||[rows.length+' 筆項目','資料已更新','可套用篩選'];return `${pagebar(title,'<button class="outline" data-toast="已建立示範篩選條件">篩選</button><button class="outline" data-modal="spm-action">動作⌄</button>')}<div class="content"><div class="spm-summary">${summaries.map((x,i)=>`<div><small>${['總覽','需關注','狀態'][i]}</small><strong>${x}</strong></div>`).join('')}</div></div><div class="content spm-list-page"><aside class="spm-filter"><h3>篩選</h3><input placeholder="搜尋篩選條件"><button>公司　⌄</button><button>嚴重程度　⌄</button><button>狀態　⌄</button><button>日期範圍　⌄</button></aside><section class="panel table-panel"><div class="table-tools"><b>${rows.length} 筆結果</b><span class="spacer"></span><input class="spm-search" placeholder="搜尋${title}"><button data-toast="示範資料已準備匯出">↓</button></div><div class="table-scroll"><table class="data-table"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((v,i)=>`<td class="${i===0?'name':''}">${v}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section></div>`}
+ const fallback=[spmNames[state.page]||'安全態勢管理',['項目','公司','類型','更新時間','狀態'],[['示範項目 A','Saperix, Inc.','資安資訊','今天','需檢視'],['示範項目 B','Awesome Inc','監控資訊','昨天','已確認']]];const [title,headers,rows]=cfg[state.page]||fallback;const summaries={'spm-company-details':['3 家公司','420 主要評等','2 個組織節點'],'spm-findings':['1,063 項發現','155 項高優先','799 項屬於主要公司'],'spm-risk-vectors':['4 個風險面向','1 個改善中','2 個需優先處理'],'spm-threat-detection':['3 項重大弱點','9 個暴露資產','2 項遭實際利用'],'spm-attack-surface':['318 個資產','43 項近期變更','12 個需確認'],'spm-assets':['318 個資產','184 個網域','97 個 IP 位址'],'spm-digital-footprint':['246 個外部資產','17 項新發現','8 項高風險'],'spm-action-plans':['2 個行動計畫','6 個進行中工作','1 個即將到期'],'spm-remediation':['3 個改善事項','1 個進行中','0 個逾期'],'spm-peer':['第 18 百分位','同業中位數 710','評等差距 −290'],'spm-collaboration':['2 個待回覆','1 個進行中','0 個已逾期'],'spm-alerts':['3 個近期警示','2 個未讀','1 個已處理'],'spm-alert-settings':['2 個啟用規則','1 個暫停','2 種通知管道'],'spm-reports':['3 份報表','2 個排程','今天更新'],'spm-integrations':['1 個已連線','2 個可設定','10 分鐘前同步']}[state.page]||[rows.length+' 筆項目','資料已更新','可套用篩選'];return `${pagebar(title,'<button class="outline" data-toast="已建立示範篩選條件">篩選</button><button class="outline" data-modal="spm-action">動作⌄</button>')}<div class="content"><div class="spm-summary">${summaries.map((x,i)=>`<div><small>${['總覽','需關注','狀態'][i]}</small><strong>${x}</strong></div>`).join('')}</div></div><div class="content spm-list-page"><aside class="spm-filter"><h3>篩選</h3><input placeholder="搜尋篩選條件"><button>公司　⌄</button><button>嚴重程度　⌄</button><button>狀態　⌄</button><button>日期範圍　⌄</button></aside><section class="panel table-panel"><div class="table-tools"><b>${rows.length} 筆結果</b><span class="spacer"></span><input class="spm-search" placeholder="搜尋${title}"><button data-toast="示範資料已準備匯出">↓</button></div><div class="table-scroll"><table class="data-table"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((v,i)=>`<td class="${i===0?'name':''}">${v}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section></div>`}
