@@ -34,7 +34,16 @@ function criticalAssetsView(){
     ['訪客網路排除',['是','否']],
     ['訪客網路排除結束日期',[],'date-range'],
     ['雲端平台',[],'empty'],
-    ['雲端服務',[],'empty']
+    ['雲端服務',[],'empty'],
+    ['雲端區域',[],'empty'],
+    ['產品支援',['不受支援','受支援','未指定']],
+    ['已識別產品',[],'empty'],
+    ['弱點',[],'empty'],
+    ['弱點嚴重程度',['重大（CVSS 9.0–10.0）','高（CVSS 7.0–8.9）','中（CVSS 4.0–6.9）','低（CVSS 0.0–3.9）']],
+    ['弱點證據確定程度',['已確認','很可能','可能']],
+    ['弱點證據偵測',['暴露','緩解']],
+    ['弱點聲明',['無聲明','未審查','不受影響','審查中','已接受風險']],
+    ['弱點聲明可見性',['內部','外部']]
   ];
   const rows=portfolioState.assets;
   return `${pagebar('關鍵資產',`<button class="outline" data-assets-upload>↥　上傳資產</button>`)}<div class="content portfolio-content"><div class="companies-layout"><div class="filters"><div class="filter-top"><button class="active">▽ 篩選</button><button data-modal="views">♧</button></div><input class="filter-search" placeholder="搜尋篩選條件…"><div class="filter-scroll">${portfolioFilters(filters)}</div><button class="filter-bottom" data-modal="create-view">建立檢視</button></div><div class="panel table-panel"><div class="table-tools"><span>${rows.length} 筆</span><button class="portfolio-unmonitor" data-assets-unmonitor>停止監控（${rows.length}）</button><span class="spacer"></span><button data-toast="可搜尋示範資產">⌕</button><button data-toast="已準備示範匯出">↓</button><button data-toggle="fullscreen">⛶</button></div><div class="table-scroll"><table class="data-table"><thead><tr><th><input type="checkbox" data-select-all></th><th>資產</th><th>資產類型</th><th>公司</th><th>重要性　↓</th><th>訪客網路排除</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td><input type="checkbox" class="row-check" data-asset-check="${i}"></td><td class="name">${e(r[0])}</td><td>${e(r[1])}</td><td>${e(r[2])}</td><td>${e(r[3])}</td><td>否</td></tr>`).join('')}</tbody></table>${rows.length?'':'<div class="asset-empty"><div class="asset-illustration">▤<span>⌕</span></div><p>要開始使用，請從供應商的基礎設施頁面選取資產，<br>或使用「上傳資產」按鈕匯入 CSV。</p><button class="portfolio-blue" data-toast="可從基礎設施頁面選取資產，或載入下方示範資料">了解更多</button></div>'}</div><div class="pager"><button>30⌄</button><span>0 – ${rows.length}，共 ${rows.length} 筆</span><span class="spacer"></span><button>‹</button><span>${rows.length?'1 / 1':'0 / 0'}</span><button>›</button></div></div></div>${portfolioState.assetUploadOpen?`<div class="portfolio-upload panel"><strong>上傳資產</strong><p>這是本機示範操作。你可以載入虛構範例資產，或選擇自己的 CSV；資料只在此瀏覽器分頁處理。</p><input type="file" id="assetFile" accept=".csv,text/csv"><div><button class="outline" data-assets-cancel>取消</button><button class="portfolio-blue" data-assets-example>載入示範資產</button></div></div>`:''}</div>`;
