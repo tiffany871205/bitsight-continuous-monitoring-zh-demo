@@ -10,7 +10,13 @@ function portfolioView(page){
   if(page==='compare')return comparePortfolioView();
   return `${pagebar('到期訂閱')}<div class="expired-space" aria-label="目前未顯示到期訂閱內容"></div><div class="footer">獨立繁體中文操作範例 · 此頁依目前帳號可見的空白狀態重建</div>`;
 }
-function portfolioFilters(list){return list.map(([label,opts])=>`<div class="filter-row"><button data-portfolio-filter="${e(label)}">${e(label)}<span>⌄</span></button>${portfolioState.assetFilterOpen===label?`<div class="filter-options">${opts.map(o=>`<label><input type="checkbox" data-asset-filter-value="${e(label)}" value="${e(o)}" ${portfolioState.assetFilters[label]?.includes(o)?'checked':''}> ${e(o)}</label>`).join('')}</div>`:''}</div>`).join('');}
+function portfolioFilterOptions(label,opts,type){
+  if(type==='number-range')return `<div class="filter-options portfolio-range-filter"><label>最小值<input type="number" min="0" inputmode="numeric" aria-label="${e(label)}最小值"></label><span>－</span><label>最大值<input type="number" min="0" inputmode="numeric" aria-label="${e(label)}最大值"></label></div>`;
+  if(type==='date-range')return `<div class="filter-options portfolio-date-filter"><label>開始日期<input type="date" aria-label="${e(label)}開始日期"></label><label>結束日期<input type="date" aria-label="${e(label)}結束日期"></label></div>`;
+  if(type==='empty')return `<div class="filter-options portfolio-empty-filter">沒有可用選項</div>`;
+  return `<div class="filter-options">${opts.map(o=>`<label><input type="checkbox" data-asset-filter-value="${e(label)}" value="${e(o)}" ${portfolioState.assetFilters[label]?.includes(o)?'checked':''}> ${e(o)}</label>`).join('')}</div>`;
+}
+function portfolioFilters(list){return list.map(([label,opts,type='checkbox'])=>{const open=portfolioState.assetFilterOpen===label;return `<div class="filter-row"><button data-portfolio-filter="${e(label)}" aria-expanded="${open}">${e(label)}<span>${open?'⌃':'⌄'}</span></button>${open?portfolioFilterOptions(label,opts,type):''}</div>`;}).join('');}
 function assessmentsPortfolioView(){
   const status=portfolioState.assessmentStatus;
   const rows=status==='已完成'?[]:demoAssessments.filter(r=>status==='全部'||r[3]===status).filter(r=>!portfolioState.assessmentFilter||r.join(' ').includes(portfolioState.assessmentFilter));
@@ -19,7 +25,17 @@ function assessmentsPortfolioView(){
 }
 
 function criticalAssetsView(){
-  const filters=[['資產類型',['網域','IP 位址']],['發現事項數量',['0','1–10','10 以上']],['重要性',['高','中','低']],['寬限期',['有','無']],['寬限期結束日期',['最近 30 天']],['訪客網路排除',['是','否']],['訪客網路排除結束日期',['最近 30 天']],['雲端平台',['AWS','Azure']],['雲端服務',['運算','儲存']]];
+  const filters=[
+    ['資產類型',['IP 位址','網域','Android','iOS']],
+    ['發現事項數量',[],'number-range'],
+    ['重要性',['重大','高','中','低']],
+    ['寬限期',['是','否']],
+    ['寬限期結束日期',[],'date-range'],
+    ['訪客網路排除',['是','否']],
+    ['訪客網路排除結束日期',[],'date-range'],
+    ['雲端平台',[],'empty'],
+    ['雲端服務',[],'empty']
+  ];
   const rows=portfolioState.assets;
   return `${pagebar('關鍵資產',`<button class="outline" data-assets-upload>↥　上傳資產</button>`)}<div class="content portfolio-content"><div class="companies-layout"><div class="filters"><div class="filter-top"><button class="active">▽ 篩選</button><button data-modal="views">♧</button></div><input class="filter-search" placeholder="搜尋篩選條件…"><div class="filter-scroll">${portfolioFilters(filters)}</div><button class="filter-bottom" data-modal="create-view">建立檢視</button></div><div class="panel table-panel"><div class="table-tools"><span>${rows.length} 筆</span><button class="portfolio-unmonitor" data-assets-unmonitor>停止監控（${rows.length}）</button><span class="spacer"></span><button data-toast="可搜尋示範資產">⌕</button><button data-toast="已準備示範匯出">↓</button><button data-toggle="fullscreen">⛶</button></div><div class="table-scroll"><table class="data-table"><thead><tr><th><input type="checkbox" data-select-all></th><th>資產</th><th>資產類型</th><th>公司</th><th>重要性　↓</th><th>訪客網路排除</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td><input type="checkbox" class="row-check" data-asset-check="${i}"></td><td class="name">${e(r[0])}</td><td>${e(r[1])}</td><td>${e(r[2])}</td><td>${e(r[3])}</td><td>否</td></tr>`).join('')}</tbody></table>${rows.length?'':'<div class="asset-empty"><div class="asset-illustration">▤<span>⌕</span></div><p>要開始使用，請從供應商的基礎設施頁面選取資產，<br>或使用「上傳資產」按鈕匯入 CSV。</p><button class="portfolio-blue" data-toast="可從基礎設施頁面選取資產，或載入下方示範資料">了解更多</button></div>'}</div><div class="pager"><button>30⌄</button><span>0 – ${rows.length}，共 ${rows.length} 筆</span><span class="spacer"></span><button>‹</button><span>${rows.length?'1 / 1':'0 / 0'}</span><button>›</button></div></div></div>${portfolioState.assetUploadOpen?`<div class="portfolio-upload panel"><strong>上傳資產</strong><p>這是本機示範操作。你可以載入虛構範例資產，或選擇自己的 CSV；資料只在此瀏覽器分頁處理。</p><input type="file" id="assetFile" accept=".csv,text/csv"><div><button class="outline" data-assets-cancel>取消</button><button class="portfolio-blue" data-assets-example>載入示範資產</button></div></div>`:''}</div>`;
 }
