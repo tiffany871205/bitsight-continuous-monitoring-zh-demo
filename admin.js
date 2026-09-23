@@ -1,31 +1,35 @@
-const adminState={query:'',folder:0,toggle:true,invitationFilterOpen:'日期',invitationFilterQuery:'',invitationFilters:{},invitationSelected:[]};
+const adminState={query:'',folder:0,toggle:true,invitationFilterOpen:'協作原因',invitationFilterQuery:'',invitationFilters:{},invitationSelected:[],invitationDate:''};
 const contactRows=[['王小明','security@example-bank.test','範例商業銀行','主要聯絡人'],['陳美玲','risk@example-cloud.test','範例雲端服務','風險負責人'],['林志強','it@example-telco.test','範例電信公司','技術聯絡人']];
 function adminToolbar(title,count,action){return `<div class="admin-toolbar"><input id="adminSearch" value="${e(adminState.query)}" placeholder="搜尋${title}…"><span>${count} 筆</span><button class="outline" data-toast="已準備示範匯出">下載</button>${action?`<button class="save" data-admin-create="${action}">${action}</button>`:''}</div>`}
 const invitationFilters=[
-  ['日期',['過去 7 天','過去 30 天','過去 90 天','自訂日期範圍']],
-  ['寄件者',['管理者','風險管理團隊','API']],
-  ['收件公司',['範例資訊服務','範例商業銀行','範例金融控股','範例電信公司']],
-  ['收件者',['主要協作聯絡人','資安窗口','未指派']],
-  ['協作原因',['改善','評估','其他']],
-  ['待檢視項目',['DNSSEC','DKIM','TLS/SSL 設定','開放連接埠','重大弱點管理']],
-  ['狀態',['開啟','已解決','邀請已到期','等待回覆']],
-  ['資料夾',['全部公司','重要供應商','金融服務','資訊服務']],
-  ['層級',['層級 1','層級 2','層級 3','未分層']],
-  ['行動計畫',['需要改善','持續監控','優先處理']],
-  ['關係',['供應商','策略夥伴','第四方','子公司']],
+  ['日期',['7 天','1 個月','3 個月','自訂'],'date'],
+  ['寄件者',['API','已刪除的使用者','Peter','spm.demo']],
+  ['收件公司',['Awesome Inc','國泰世華商業銀行','精誠資訊','華南永昌證券','兆豐金融控股','兆豐國際商業銀行']],
+  ['收件者',['8859','協作聯絡人','Demo9','Peter Peng','security.test','未指派']],
+  ['協作原因',['資訊提供','改善','驗證','弱點','其他','自行提出','未指派']],
+  ['待檢視項目',[],'select'],
+  ['狀態',['等待中','開啟','已解決','邀請已到期','需要核准']],
+  ['資料夾',['Transglobe','兆豐銀行','南山產物','臺灣企銀','金融同業','非金融機構','未指派','未訂閱']],
+  ['層級',['層級 1','層級 2','層級 3','未分層','未訂閱']],
+  ['行動計畫',['監控','檢視','升級處理','未指派']],
+  ['關係',['供應商','策略夥伴','第四方','子公司','基準比較','客戶','顧問','其他','未指派']],
   ['生命週期',['導入中','監控中','重新評估','未指派']]
 ];
 const invitationRows=[
-  ['2026/08/25','管理者','範例資訊服務','主要協作聯絡人','改善','DNSSEC','開啟'],
-  ['2026/05/28','風險管理團隊','範例商業銀行','資安窗口','改善','—','開啟'],
-  ['2026/05/15','API','範例金融控股','未指派','其他','—','邀請已到期']
+  ['2026/08/25','spm.demo','精誠資訊','Demo9','改善','DNSSEC','開啟'],
+  ['2026/05/28','Peter','兆豐國際商業銀行','security.test','改善','—','開啟'],
+  ['2026/05/15','API','國泰世華商業銀行','未指派','其他','—','邀請已到期']
 ];
-function invitationFilterBody(name,options){const values=adminState.invitationFilters[name]||[];return options.slice(0,20).map(option=>`<label><input type="checkbox" data-invitation-option="${e(name)}" value="${e(option)}" ${values.includes(option)?'checked':''}> ${e(option)}</label>`).join('')}
+function invitationFilterBody(name,options,type){
+  if(type==='date')return `<div class="invitation-date-buttons">${options.map(option=>`<button class="${adminState.invitationDate===option?'active':''}" data-invitation-date="${e(option)}">${e(option)}</button>`).join('')}</div>`;
+  if(type==='select')return `<button class="filter-select-count" data-toast="已開啟待檢視項目選擇器">0 個已選 <span>⌄</span></button>`;
+  const values=adminState.invitationFilters[name]||[];return options.slice(0,20).map(option=>`<label><input type="checkbox" data-invitation-option="${e(name)}" value="${e(option)}" ${values.includes(option)?'checked':''}> ${e(option)}</label>`).join('')
+}
 function invitationsView(){
   const active=Object.entries(adminState.invitationFilters).flatMap(([group,values])=>values.map(value=>[group,value]));
-  const groups=invitationFilters.filter(([name])=>!adminState.invitationFilterQuery||name.includes(adminState.invitationFilterQuery)).map(([name,options])=>`<div class="filter-row"><button data-invitation-filter="${e(name)}"><span>${e(name)}${adminState.invitationFilters[name]?.length?` <b class="filter-count">${adminState.invitationFilters[name].length}</b>`:''}</span><span>${adminState.invitationFilterOpen===name?'⌃':'⌄'}</span></button>${adminState.invitationFilterOpen===name?`<div class="filter-options invitation-filter-options">${invitationFilterBody(name,options)}</div>`:''}</div>`).join('');
+  const groups=invitationFilters.filter(([name])=>!adminState.invitationFilterQuery||name.includes(adminState.invitationFilterQuery)).map(([name,options,type])=>`<div class="filter-row"><button data-invitation-filter="${e(name)}"><span>${e(name)}${adminState.invitationFilters[name]?.length?` <b class="filter-count">${adminState.invitationFilters[name].length}</b>`:''}</span><span>${adminState.invitationFilterOpen===name?'⌃':'⌄'}</span></button>${adminState.invitationFilterOpen===name?`<div class="filter-options invitation-filter-options">${invitationFilterBody(name,options,type)}</div>`:''}</div>`).join('');
   const rows=invitationRows.filter(row=>(!adminState.query||row.join(' ').includes(adminState.query))&&Object.entries(adminState.invitationFilters).every(([group,values])=>!values.length||values.some(value=>row.includes(value))));
-  return `${pagebar('存取邀請')}<div class="invitation-summary"><div><small>已邀請的投資組合比例</small><strong>8%</strong><span>已向 4 家公司傳送 12 封邀請</span></div><div><small>邀請接受率</small><strong>83%</strong><span>12 封邀請中已有 10 封接受</span></div><div><small>目前狀態分布</small><strong>0</strong><span>封邀請等待回覆</span><button data-toast="已開啟完整狀態分布">查看完整分布⌄</button></div></div><div class="content invitation-content"><div class="companies-layout invitation-layout"><aside class="filters"><div class="filter-top"><button class="active">▽ 篩選</button><button data-modal="columns">▥</button><button data-modal="views">♧</button></div><input id="invitationFilterSearch" class="filter-search" value="${e(adminState.invitationFilterQuery)}" placeholder="搜尋篩選條件…">${active.length?`<div class="vuln-active-head"><b>使用中的篩選</b><button data-invitation-clear>清除全部</button></div><div class="vuln-active-chips">${active.map(([group,value])=>`<button data-invitation-remove="${e(group)}" data-invitation-value="${e(value)}">${e(value)}　×</button>`).join('')}</div>`:''}<div class="filter-scroll">${groups}</div><button class="filter-bottom" data-modal="create-view">建立檢視</button></aside><section class="panel table-panel invitation-table"><div class="table-tools"><span>${rows.length} 封邀請</span><button class="outline" data-toast="請先選擇邀請">標示為已解決 (${adminState.invitationSelected.length}/1)</button><button class="outline" data-toast="請先選擇自行提出的邀請">核准自行提出的要求</button><span class="spacer"></span><button data-toggle="invitation-search">⌕</button><button data-toast="已準備示範 CSV">↓</button><button data-toggle="fullscreen">⛶</button></div><div id="invitationSearchBox" style="display:${adminState.query?'block':'none'};padding:0 12px 10px"><input id="invitationSearch" value="${e(adminState.query)}" placeholder="搜尋邀請" class="table-search-input"></div><div class="table-scroll"><table class="data-table"><thead><tr><th><input type="checkbox" data-invitation-select-all></th><th>日期 ↓</th><th>寄件者</th><th>收件公司</th><th>收件者</th><th>協作原因</th><th>待檢視項目</th><th>狀態</th><th></th></tr></thead><tbody>${rows.map((row,index)=>`<tr><td><input type="checkbox" data-invitation-select="${index}" ${adminState.invitationSelected.includes(index)?'checked':''}></td>${row.map((cell,i)=>`<td class="${i===2?'name':''}">${i===6?`<span class="state-pill ${cell==='開啟'?'pending':''}">${e(cell)}</span>`:e(cell)}</td>`).join('')}<td class="invitation-actions"><button data-toast="已準備下載邀請明細">下載明細</button><button data-toast="已開啟訊息紀錄">檢視訊息</button><button data-toast="已將示範邀請標示為已解決">標示為已解決</button></td></tr>`).join('')}</tbody></table>${rows.length?'':'<div class="empty">沒有符合條件的邀請</div>'}</div><div class="pager"><span>1 – ${rows.length}，共 ${rows.length} 筆</span><span class="spacer"></span><button>‹</button><span>1 / 1</span><button>›</button></div></section></div></div>`
+  return `${pagebar('存取邀請')}<div class="invitation-summary"><div><small>已邀請的投資組合</small><strong>12</strong><span>封邀請已傳送給 <b>4</b> 家公司</span></div><div><small>邀請接受情形</small><strong>10</strong><span>封邀請已接受，共 <b>12</b> 封</span></div><div><small>目前狀態分布</small><strong>0</strong><span>封邀請等待回覆</span><button data-toast="已開啟完整狀態分布">查看完整分布⌄</button></div></div><div class="content invitation-content"><div class="companies-layout invitation-layout"><aside class="filters"><div class="filter-top"><button class="active">▽ 篩選</button><button data-modal="columns">▥</button><button data-modal="views">♧</button></div><input id="invitationFilterSearch" class="filter-search" value="${e(adminState.invitationFilterQuery)}" placeholder="搜尋篩選條件…">${active.length||adminState.invitationDate?`<div class="vuln-active-head"><b>使用中的篩選</b><button data-invitation-clear>清除全部</button></div><div class="vuln-active-chips">${adminState.invitationDate?`<button data-invitation-date="">${e(adminState.invitationDate)}　×</button>`:''}${active.map(([group,value])=>`<button data-invitation-remove="${e(group)}" data-invitation-value="${e(value)}">${e(value)}　×</button>`).join('')}</div>`:''}<div class="filter-scroll">${groups}</div><button class="filter-bottom" data-modal="create-view">建立檢視</button></aside><section class="panel table-panel invitation-table"><div class="table-tools"><span>${rows.length} 封邀請</span><button class="outline" data-toast="請先選擇邀請">標示為已解決 (${adminState.invitationSelected.length}/1)</button><button class="outline" data-toast="請先選擇自行提出的邀請">核准自行提出的要求</button><span class="spacer"></span><button data-toggle="invitation-search">⌕</button><button data-toast="已準備示範 CSV">↓</button><button data-toggle="fullscreen">⛶</button></div><div id="invitationSearchBox" style="display:${adminState.query?'block':'none'};padding:0 12px 10px"><input id="invitationSearch" value="${e(adminState.query)}" placeholder="搜尋邀請" class="table-search-input"></div><div class="table-scroll"><table class="data-table"><thead><tr><th><input type="checkbox" data-invitation-select-all></th><th>日期 ↓</th><th>寄件者</th><th>收件公司</th><th>收件者</th><th>協作原因</th><th>待檢視項目</th><th>狀態</th><th></th></tr></thead><tbody>${rows.map((row,index)=>`<tr><td><input type="checkbox" data-invitation-select="${index}" ${adminState.invitationSelected.includes(index)?'checked':''}></td>${row.map((cell,i)=>`<td class="${i===2?'name':''}">${i===6?`<span class="state-pill ${cell==='開啟'?'pending':''}">${e(cell)}</span>`:e(cell)}</td>`).join('')}<td class="invitation-actions"><button data-toast="已準備下載邀請明細">下載明細</button><button data-toast="已開啟訊息紀錄">檢視訊息</button><button data-toast="已將示範邀請標示為已解決">標示為已解決</button></td></tr>`).join('')}</tbody></table>${rows.length?'':'<div class="empty">沒有符合條件的邀請</div>'}</div><div class="pager"><span>1 – ${rows.length}，共 ${rows.length} 筆</span><span class="spacer"></span><button>‹</button><span>1 / 1</span><button>›</button></div></section></div></div>`
 }
 function linksView(){return `${pagebar('供應商存取連結')}<div class="content">${adminToolbar('連結',2,'建立存取連結')}<section class="panel"><table class="data-table"><thead><tr><th>連結名稱</th><th>適用公司</th><th>建立者</th><th>到期日</th><th>使用次數</th><th>狀態</th></tr></thead><tbody><tr data-admin-row><td class="name">年度評估回覆連結</td><td>範例商業銀行</td><td>管理者</td><td>2026/10/31</td><td>3</td><td><span class="state-pill good">有效</span></td></tr><tr data-admin-row><td class="name">改善證明上傳</td><td>範例資訊服務</td><td>管理者</td><td>2026/09/30</td><td>1</td><td><span class="state-pill pending">即將到期</span></td></tr></tbody></table></section></div>`}
 function contactsView(){const rows=contactRows.filter(r=>!adminState.query||r.join(' ').includes(adminState.query));return `${pagebar('供應商聯絡人')}<div class="content">${adminToolbar('聯絡人',rows.length,'新增聯絡人')}<section class="panel"><table class="data-table"><thead><tr><th>姓名</th><th>電子郵件</th><th>公司</th><th>角色</th></tr></thead><tbody>${rows.map(r=>`<tr data-admin-row>${r.map((x,i)=>`<td class="${i===0?'name':''}">${x}</td>`).join('')}</tr>`).join('')}</tbody></table></section></div>`}
@@ -44,7 +48,9 @@ document.addEventListener('click',event=>{
   if(group){const name=group.dataset.invitationFilter;adminState.invitationFilterOpen=adminState.invitationFilterOpen===name?'':name;render();return;}
   const remove=event.target.closest('[data-invitation-remove]');
   if(remove){const groupName=remove.dataset.invitationRemove;adminState.invitationFilters[groupName]=(adminState.invitationFilters[groupName]||[]).filter(value=>value!==remove.dataset.invitationValue);render();return;}
-  if(event.target.closest('[data-invitation-clear]')){adminState.invitationFilters={};render();return;}
+  if(event.target.closest('[data-invitation-clear]')){adminState.invitationFilters={};adminState.invitationDate='';render();return;}
+  const date=event.target.closest('[data-invitation-date]');
+  if(date){adminState.invitationDate=date.dataset.invitationDate;render();return;}
   if(event.target.closest('[data-toggle="invitation-search"]')){const box=document.getElementById('invitationSearchBox');if(box)box.style.display=box.style.display==='none'?'block':'none';}
 });
 document.addEventListener('input',event=>{
