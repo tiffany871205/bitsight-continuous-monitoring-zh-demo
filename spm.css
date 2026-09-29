@@ -119,3 +119,26 @@
 
 /* Three independent dashboard stacks: cards in one column no longer create gaps in another. */
 .spm-columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:22px;align-items:start}.spm-column{display:flex;flex-direction:column;gap:22px;min-width:0}.spm-columns .spm-card{width:100%;grid-column:auto!important;grid-row:auto!important}.spm-columns .rating-card{min-height:230px!important}.spm-columns .changes-card{min-height:250px!important}.spm-columns .alerts-card{min-height:260px!important}.spm-columns .priority-card{min-height:502px!important}.spm-columns .infrastructure-card{min-height:260px!important}.spm-columns .discovery-card{min-height:230px!important}.spm-columns .recommendation-card{min-height:250px!important}.spm-columns .severe-card{min-height:260px!important}@media(max-width:1100px){.spm-columns{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.spm-columns{grid-template-columns:1fr}}
+
+/* Flex layout for SPM dashboard columns */
+.spm-columns{
+  display:flex;
+  gap:22px;
+  margin-top:22px;
+  align-items:flex-start;
+}
+.spm-column{
+  flex:1 1 0;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+}
+@media(max-width:1100px){
+  .spm-columns{flex-wrap:wrap}
+  .spm-column{flex:1 1 calc(50% - 11px)}
+}
+@media(max-width:700px){
+  .spm-columns{display:block}
+  .spm-column{width:100%;margin-bottom:22px}
+}
