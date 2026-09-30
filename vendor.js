@@ -178,4 +178,28 @@ function subsidiaryImprovementView(){
  return `${pagebar('子公司改善')}<main class="subsidiary-improvement-page"><section class="subsidiary-impact-card"><header><div><b>Saperix, Inc. 影響分析</b><span class="subsidiary-info">ⓘ</span><small>上次更新：<strong>2026 年 9 月 29 日</strong></small></div><button data-toast="已準備匯出子公司改善 CSV">⇩　匯出（.csv）</button></header><div class="subsidiary-notice"><span>ⓘ</span><p>重大弱點管理風險面向只能在母公司層級計算，無法依子公司個別計算。 <a>深入了解</a></p><button data-dismiss-subsidiary-notice aria-label="關閉">×</button></div><div class="subsidiary-chart-head"><b>步驟</b><span>目前評等：<strong>420</strong></span><span>預估評等：<strong>780</strong></span></div><div class="subsidiary-impact-chart"><i class="subsidiary-current-line"></i><i class="subsidiary-projected-line"></i>${steps.map(([company,risk,rating,hidden],i)=>`<div class="subsidiary-step"><strong>${i+1}</strong><div class="subsidiary-step-label"><b>${company}</b><span>${risk}</span></div>${hidden?'<span class="subsidiary-hidden" title="此子公司資訊已隱藏">◉̸</span>':'<span></span>'}<div class="subsidiary-bar-track"><span style="width:${Math.max(2,(rating-420)/4)}%"></span></div></div>`).join('')}</div><div class="subsidiary-axis"><b>評等改善幅度</b><div>${ticks.map(t=>`<span>${t}</span>`).join('')}</div></div><div class="subsidiary-rating-zones"><span>基礎（300–630）</span><span>中階（640–730）</span><span>進階（740–820）</span></div></section></main>`;
 }
 
+function controlInsightsView(){
+ const controls=[
+  ['企業資產盤點與控制','需改善','user',[['negative','組織網路中連上網際網路的過時行動裝置比例偏高，顯示允許使用的行動裝置控制成效不足。']]],
+  ['軟體資產盤點與控制','需改善','current',[['negative','偵測到與辦公生產力無關的軟體，顯示端點軟體安裝控制成效不足。'],['negative','過時行動裝置比例偏高，顯示允許使用的行動裝置控制成效不足。']]],
+  ['資料保護','可接受','user',[]],
+  ['企業資產與軟體的安全設定','需改善','current',[['negative','偵測到過時的桌面瀏覽器，顯示工作站安全設定成效不足。'],['negative','部分 TLS／SSL 憑證無法由受信任的根憑證授權單位驗證，顯示 TLS／SSL 設定管理成效不足。']]],
+  ['帳號管理','需改善','current',[['negative','偵測到多個潛在不需要程式（PUP），顯示工作站軟體安裝控制成效不足。'],['negative','偵測到點對點檔案分享，使用者可能不瞭解從不受信任來源下載軟體的風險。']]],
+  ['存取控制管理','需改善','user',[]],
+  ['持續弱點管理','可接受','current',[['positive','超過一個月未發現已確認弱點，顯示持續弱點管理具有效果。']]],
+  ['稽核記錄管理','需改善','user',[]],
+  ['電子郵件與網頁瀏覽器防護','資料不足','current',[]],
+  ['惡意程式防禦','需改善','current',[['negative','持續或重複發生的惡意程式感染，顯示惡意程式防護或事件回應成效不足。'],['negative','偵測到多個潛在不需要程式（PUP），顯示工作站軟體安裝控制成效不足。']]],
+  ['資料復原','資料不足','current',[]],
+  ['網路基礎架構管理','可接受','current',[['positive','未發現網路裝置弱點，顯示網路裝置控制、修補及管理具有效果。']]],
+  ['網路監控與防禦','需改善','current',[['negative','偵測到點對點檔案分享，顯示工作站軟體安裝控制成效不足。']]],
+  ['資安意識與技能訓練','需改善','current',[['negative','點對點檔案分享顯示使用者可能不瞭解從不受信任來源下載軟體的風險。']]],
+  ['服務供應商管理','資料不足','current',[]],
+  ['應用程式軟體安全','可接受','current',[['positive','已採用建議的 HTTP 安全標頭，顯示網頁伺服器設定安全且有效。']]],
+  ['事件回應管理','資料不足','current',[]],
+  ['滲透測試','資料不足','current',[]]
+ ];
+ return `${pagebar('控制措施洞察','<button data-toast="已開啟控制措施洞察報表">報表　▧</button>')}<main class="control-insights-page"><div class="control-toolbar"><label>框架<select><option>CIS 8</option></select></label><span class="spacer"></span><label>排序方式<select><option>控制措施編號（升冪）</option><option>評估結果</option></select></label><div class="control-segment"><button class="active" data-control-mode="controls">控制措施</button><button data-control-mode="safeguards">防護措施</button></div></div><section class="control-summary"><span>目前評估（2026 年 7 月）</span><div><button data-control-filter="需改善"><small>需改善</small><b class="bad">8</b><i>→</i></button><button data-control-filter="可接受"><small>可接受</small><b class="good">4</b><i>→</i></button><button data-control-filter="資料不足"><small>資料不足</small><b>6</b><i>→</i></button></div><details><summary>檢視完整明細</summary><p><b>18</b> 項控制措施已完成評估，其中 12 項具有可判讀的資料。</p></details></section><section class="control-list-wrap"><button class="control-filter-button" data-toast="已開啟控制措施篩選器">▽</button><header><b id="controlCount">18 項控制措施</b><label>⌕<input id="controlSearch" placeholder="搜尋控制措施"></label></header><div class="control-cards">${controls.map(([name,status,source,insights],i)=>`<article class="control-card" data-control-card data-status="${status}" data-control-name="${i+1} ${name}"><header><div><small>控制措施</small><h2>${i+1}. ${name}</h2></div><div class="control-evaluation"><small>${source==='user'?'♙　使用者提交的評估':'目前評估（7 月）'}</small><span class="${status==='需改善'?'bad':status==='可接受'?'good':'empty'}">${status==='需改善'?'⊗':status==='可接受'?'✓':'—'}　${status}</span><button aria-label="更多選項" data-toast="已開啟控制措施選項">⋮</button></div></header>${insights.length?`<div class="control-insights">💡${insights.map(([type,text])=>`<p><b class="${type}">${type==='negative'?'⊗ 負面':'✓ 正面'}</b>${text}</p>`).join('')}<button data-toast="已開啟「${name}」詳細資料">→<small>${insights.length>1?'更多洞察':'檢視詳細資料'}</small></button></div>`:''}</article>`).join('')}</div></section></main>`;
+}
+
 function newForecastModal(){return `<div class="modal-back"><section class="new-forecast-modal"><header><button data-close-modal aria-label="關閉">×</button><h2>新增預測</h2></header><p>請為此預測命名，並選擇適用的公司。</p><label>預測名稱<input id="newForecastName" maxlength="30"><small><span id="forecastNameCount">0</span>/30</small></label><label>公司<select id="newForecastCompany"><option value="">請選擇公司以開始使用</option><option>Saperix, Inc.</option><option>ABC-Test</option><option>Awesome Inc</option></select></label><footer><button data-close-modal>取消</button><button class="primary-action" data-save-forecast disabled>儲存</button></footer></section></div>`;}
