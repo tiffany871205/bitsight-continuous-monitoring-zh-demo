@@ -257,4 +257,31 @@ function collaborationInboxView(){
  return `${pagebar('協作收件匣')}<main class="collaboration-page"><aside class="collaboration-filters"><div class="collab-filter-tabs"><button class="active">▽　篩選</button><button data-toast="已開啟欄位設定">▥</button><button data-modal="views">♧</button><button aria-label="關閉篩選欄">‹</button></div><label class="collab-filter-search">⌕<input placeholder="搜尋篩選條件…"></label><div class="collab-filter-list">${filters.map(([name,content])=>`<details><summary>${name}<span>⌄</span></summary><div>${content}</div></details>`).join('')}</div><button class="collab-create" data-modal="create-view">建立檢視</button></aside><section class="collaboration-table table-panel"><div class="collab-table-tools"><b id="collabCount">19 封邀請</b><span></span><label>⌕<input id="collabSearch" placeholder="搜尋邀請"></label><button data-toast="協作邀請 CSV 已準備下載">⇩</button><button data-toggle="fullscreen">⛶</button></div><div class="collab-table-scroll"><table><thead><tr>${['日期 ↓','寄件公司','寄件者','收件者','待檢視項目','狀態',''].map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(([date,from,sender,recipients,items,status],i)=>`<tr data-collab-row data-collab-text="${date} ${from} ${sender} ${recipients} ${items} ${status}" data-collab-status-value="${status}"><td>${date}</td><td><span class="collab-logo">${from.slice(0,1)}</span>${from}</td><td>${sender}</td><td>${recipients.split('｜').map(x=>`<span>${x}</span>`).join('')}</td><td>${items.split('｜').map(x=>`<span>${x}</span>`).join('')}</td><td><b class="collab-status ${status==='已解決'?'resolved':''}">${status}</b></td><td><button data-toast="已開啟「${from}」邀請">›</button></td></tr>`).join('')}</tbody></table></div></section></main>`;
 }
 
+function configuredAlertsView(){
+ const rows=[
+ ['分數變化','Bitsight 評等','spm.demo（我）','Saperix, Inc.｜Saperix Corporate｜＋3 家子公司','spm.demo','已訂閱'],
+ ['Infrastructure Changes 0911','基礎設施變更','spm.demo（我）','Saperix, Inc.','spm.demo','已訂閱'],
+ ['New Findings','新發現事項','spm.demo（我）','Saperix, Inc.','spm.demo','未訂閱'],
+ ['Bitsight Infrastructure Changes Alert','弱點與感染事件','spm.demo（我）','Saperix, Inc.｜Saperix Corporate','Aaron｜spm.demo｜＋1 位收件者','未訂閱'],
+ ['Potentially Exploited Alert','新發現事項','spm.demo（我）','Saperix, Inc.','spm.demo｜Aaron','未訂閱'],
+ ['New Potentially Exploited Finding','新發現事項','spm.demo（我）','Saperix, Inc.','spm.demo｜Carl','未訂閱'],
+ ['test1','新發現事項','spm.demo（我）','Saperix, Inc.｜Awesome Inc','已刪除的使用者｜Carl｜＋1 位收件者','未訂閱'],
+ ['Test','新發現事項','spm.demo（我）','Saperix Corporate｜Awesome Inc｜＋1 家子公司','spm.demo｜已刪除的使用者｜＋1 位收件者','未訂閱'],
+ ['My Company - Standard','Bitsight 評等','spm.demo（我）','Saperix, Inc.','spm.demo','未訂閱'],
+ ['My Company - Standard','風險面向等級','spm.demo（我）','Saperix, Inc.','spm.demo','未訂閱'],
+ ['My Company - Standard','弱點與感染事件','spm.demo（我）','Saperix, Inc.','spm.demo','未訂閱'],
+ ['My Company - Standard','公開揭露','spm.demo（我）','Saperix, Inc.','spm.demo','未訂閱'],
+ ['Bitsight Public Disclosures Alert','公開揭露','spm.demo（我）','Saperix, Inc.｜Saperix Corporate','Carl｜Aaron｜＋1 位收件者','未訂閱'],
+ ['Bitsight Exposed Credentials Alert','外洩憑證','spm.demo（我）','Saperix, Inc.｜Saperix Corporate','Aaron｜Carl｜＋1 位收件者','未訂閱'],
+ ['Bitsight Rating Alert','Bitsight 評等','spm.demo（我）','Saperix, Inc.｜Saperix Corporate','Carl｜Aaron｜＋1 位收件者','未訂閱'],
+ ['Bitsight Risk Vector Grades Alert','風險面向等級','spm.demo（我）','Saperix, Inc.｜Saperix Corporate','Aaron｜Carl｜＋1 位收件者','未訂閱'],
+ ['Bitsight Vulnerabilities & Infections Alert','弱點與感染事件','spm.demo（我）','Saperix, Inc.｜Saperix Corporate','Aaron｜Carl｜＋1 位收件者','未訂閱'],
+ ['Bitsight New Findings Alert','新發現事項','spm.demo（我）','Saperix, Inc.｜Saperix Corporate','Aaron｜Carl｜＋1 位收件者','未訂閱'],
+ ['Bitsight Alert-SSL-02','新發現事項','spm.demo（我）','Saperix, Inc.','spm.demo','未訂閱'],
+ ['Bitsight Alert-SSL','新發現事項','spm.demo（我）','Saperix, Inc.','spm.demo','未訂閱']
+ ];
+ const list=x=>x.split('｜').map(v=>`<span>•　${v}</span>`).join('');
+ return `${pagebar('已設定警示','<button class="configured-add" data-toast="已開啟新增警示設定">新增警示</button>')}<main class="configured-alerts-page"><section class="configured-alerts-card"><div class="configured-alerts-tools"><b id="configuredAlertCount">20 個警示</b><div class="configured-bulk"><button disabled data-alert-bulk="subscribe">訂閱</button><button disabled data-alert-bulk="unsubscribe">取消訂閱</button><button disabled data-alert-bulk="delete">刪除</button></div><label class="configured-shared"><input type="checkbox" checked> <i></i>顯示共用警示</label><label class="configured-search">⌕<input id="configuredAlertSearch" placeholder="搜尋警示"></label></div><div class="configured-alerts-scroll"><table><thead><tr><th><input type="checkbox" id="configuredSelectAll"></th>${['名稱','警示類型','擁有者','子公司／基準群組','收件者','警示狀態',''].map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map((r,i)=>`<tr data-configured-alert-row data-alert-text="${r.join(' ')}"><td><input type="checkbox" data-alert-select></td><td><button class="configured-name" data-toast="已開啟「${r[0]}」詳細資料">${r[0]}</button></td><td>${r[1]}</td><td>${r[2]}</td><td>${list(r[3])}</td><td>${list(r[4])}</td><td><label class="alert-subscription"><input type="checkbox" ${r[5]==='已訂閱'?'checked':''}><i></i><span>${r[5]}</span></label></td><td><div class="configured-actions"><button data-toast="已開啟「${r[0]}」詳細資料">◉</button><button data-toast="已開啟「${r[0]}」編輯畫面">✎</button><button data-toast="已刪除「${r[0]}」示範警示">♲</button></div></td></tr>`).join('')}</tbody></table></div></section></main>`;
+}
+
 function newForecastModal(){return `<div class="modal-back"><section class="new-forecast-modal"><header><button data-close-modal aria-label="關閉">×</button><h2>新增預測</h2></header><p>請為此預測命名，並選擇適用的公司。</p><label>預測名稱<input id="newForecastName" maxlength="30"><small><span id="forecastNameCount">0</span>/30</small></label><label>公司<select id="newForecastCompany"><option value="">請選擇公司以開始使用</option><option>Saperix, Inc.</option><option>ABC-Test</option><option>Awesome Inc</option></select></label><footer><button data-close-modal>取消</button><button class="primary-action" data-save-forecast disabled>儲存</button></footer></section></div>`;}
