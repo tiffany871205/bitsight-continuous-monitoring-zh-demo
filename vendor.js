@@ -266,6 +266,21 @@ function alertLogsView(){
  return `${pagebar('警示記錄')}<main class="alert-logs-page"><aside class="alert-log-filters"><div class="alert-log-filter-tabs"><button class="active">▽　篩選</button><button data-modal="views">♧</button><button aria-label="關閉篩選欄">‹</button></div><label class="alert-log-filter-search">⌕<input placeholder="搜尋篩選條件…"></label><details open><summary>類別<span>⌃</span></summary><div>${cats.map((x,i)=>`<label class="${i>6?'nested':''}"><input type="checkbox" data-alert-log-cat="${x}"> ${x}</label>`).join('')}</div></details><details><summary>子公司<span>⌄</span></summary><div><button class="alert-log-subsidiary" data-toast="已開啟子公司選項">已選取 0 項　⌄</button></div></details><button class="alert-log-create" data-modal="create-view">建立檢視</button></aside><section class="alert-log-table"><div class="alert-log-tools"><b id="alertLogCount">2,634 筆記錄</b><span></span><label>⌕<input id="alertLogSearch" placeholder="搜尋警示記錄"></label><button data-toggle="fullscreen">⛶</button></div><div class="alert-log-scroll"><table><thead><tr>${['日期 ↓','子公司','類型','警示','警示名稱'].map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr data-alert-log-row data-alert-log-category="${r[2]}" data-alert-log-text="${r.join(' ')}"><td>${r[0]}</td><td><button data-toast="已開啟「${r[1]}」公司總覽">${r[1]}</button></td><td>${r[2]}</td><td><button data-nav="spm-findings">${r[3]}</button></td><td><button data-toast="已開啟「${r[4]}」警示詳細資料">${r[4]}</button></td></tr>`).join('')}</tbody></table></div><footer><select><option>40</option><option>20</option><option>100</option></select><span>1–40，共 2,634 筆</span><button disabled>上一頁</button><input value="1"><span>／66</span><button data-toast="已切換到下一頁">下一頁</button></footer></section></main>`;
 }
 
+function spmIntegrationsView(){
+ const vendors=[
+  ['Jira',['Ticketing'],'透過自動建立議題與雙向狀態更新，將發現事項順暢同步至 Jira。','jira','新'],
+  ['Microsoft Azure Sentinel',['SIEM','SOAR'],'將 Bitsight 發現事項整合至 Microsoft Sentinel，統一安全監控並加速事件應變。','sentinel',''],
+  ['Microsoft Power BI',['Reporting','Dashboard'],'將 Bitsight 資料匯入 Power BI，建立自訂儀表板、主管報告及完整的安全分析。','powerbi',''],
+  ['Palo Alto Cortex',['SOAR','SIEM'],'整合 Bitsight 資料與 Palo Alto Cortex，協調安全作業、自動回應並管理案件。','cortex',''],
+  ['ServiceNow ITSM',['Ticketing'],'將 Bitsight 發現事項轉為 ServiceNow ITSM 工單，並直接從 Bitsight 監控解決進度。','servicenow',''],
+  ['ServiceNow SIR',['Ticketing','Incident Management'],'將 Bitsight 的受入侵系統發現事項傳送至 ServiceNow SIR，加速安全事件應變。','servicenow',''],
+  ['ServiceNow USEM/VR',['Ticketing','Vulnerability Management'],'從 Bitsight 發現事項自動建立 ServiceNow Vulnerability Response 項目，並直接追蹤改善進度。','servicenow','新'],
+  ['Splunk',['SIEM','Reporting'],'將 Bitsight 發現事項與評等串流至 Splunk，進行進階安全分析與威脅調查。','splunk','']
+ ];
+ const logo=(name,type)=>`<div class="integration-logo ${type}">${type==='jira'?'<b>◢◣</b> Jira':type==='sentinel'?'<b>⬟</b> Microsoft<br><small>Sentinel</small>':type==='powerbi'?'<b>▥</b> Power BI':type==='cortex'?'<b>◐</b> CORTEX':type==='servicenow'?'servicenow':type==='splunk'?'splunk<span>›</span>':name}</div>`;
+ return `${pagebar('整合')}<main class="integrations-page"><div class="integrations-grid">${vendors.map(([name,tags,desc,type,badge])=>`<article class="integration-card">${badge?`<em>${badge}</em>`:''}${logo(name,type)}<h2>${name}</h2><div class="integration-tags">${tags.map(t=>`<span>${t}</span>`).join('')}</div><p>${desc}</p><div class="integration-actions"><button data-toast="已開啟 ${name} 詳細介紹">詳細檢視</button><button data-toast="已開啟 ${name} 快速檢視">快速檢視</button></div></article>`).join('')}<article class="integration-missing"><b>?</b><h2>找不到需要的整合？</h2><button data-toast="已開啟整合需求聯絡表單">聯絡我們</button></article></div></main>`;
+}
+
 function spmReportsCatalogView(){
  const saved=[['Executive Report by H','最後儲存：2026/09/11','JSON PDF'],['Executive Report','最後儲存：2026/09/11','JSON PDF']];
  const sections=[
