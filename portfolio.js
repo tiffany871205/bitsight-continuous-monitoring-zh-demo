@@ -1,11 +1,6 @@
-const portfolioState={assessmentStatus:'已完成',assessmentFilter:'',assetFilters:{},assetFilterOpen:'',assetUploadOpen:false,assets:[],compareEditing:false,compareSelected:[1,3],compareHidden:[],compareVectors:[]};
-const demoAssessments=[
-  ['供應商年度評估','範例商業銀行','NIST CSF','進行中','—','示範使用者','持續監控'],
-  ['資訊安全問卷','範例資訊服務','ISO 27001','草稿','—','示範使用者','持續監控']
-];
+const portfolioState={assetFilters:{},assetFilterOpen:'',assetUploadOpen:false,assets:[],compareEditing:false,compareSelected:[1,3],compareHidden:[],compareVectors:[]};
 
 function portfolioView(page){
-  if(page==='fi-assessments')return assessmentsPortfolioView();
   if(page==='critical-assets')return criticalAssetsView();
   if(page==='compare')return comparePortfolioView();
   return `${pagebar('到期訂閱')}<div class="expired-space" aria-label="目前未顯示到期訂閱內容"></div><div class="footer">獨立繁體中文操作範例 · 此頁依目前帳號可見的空白狀態重建</div>`;
@@ -17,13 +12,6 @@ function portfolioFilterOptions(label,opts,type){
   return `<div class="filter-options">${opts.map(o=>`<label><input type="checkbox" data-asset-filter-value="${e(label)}" value="${e(o)}" ${portfolioState.assetFilters[label]?.includes(o)?'checked':''}> ${e(o)}</label>`).join('')}</div>`;
 }
 function portfolioFilters(list){return list.map(([label,opts,type='checkbox'])=>{const open=portfolioState.assetFilterOpen===label;return `<div class="filter-row"><button data-portfolio-filter="${e(label)}" aria-expanded="${open}">${e(label)}<span>${open?'⌃':'⌄'}</span></button>${open?portfolioFilterOptions(label,opts,type):''}</div>`;}).join('');}
-function assessmentsPortfolioView(){
-  const status=portfolioState.assessmentStatus;
-  const rows=status==='已完成'?[]:demoAssessments.filter(r=>status==='全部'||r[3]===status).filter(r=>!portfolioState.assessmentFilter||r.join(' ').includes(portfolioState.assessmentFilter));
-  const filterList=[['公司',['範例商業銀行','範例資訊服務']],['狀態',['已完成','進行中','草稿']],['使用者',['示範使用者']],['日期',['最近 30 天','最近 90 天']],['框架',['NIST CSF','ISO 27001']]];
-  return `${pagebar('框架情報評估')}<div class="content portfolio-content"><div class="companies-layout"><div class="filters"><div class="filter-top"><button class="active">▽ 篩選</button><button data-modal="columns">▥</button><button data-modal="views">♧</button></div><input class="filter-search" placeholder="搜尋篩選條件…"><div class="filter-scroll"><div class="filter-row"><button>已套用篩選 <span data-assessment-clear style="color:#3273a5">清除全部</span></button><div class="filter-options"><span class="applied-chip">${e(status)}</span></div></div>${portfolioFilters(filterList)}</div><div class="portfolio-filter-foot"><button class="filter-bottom" data-modal="create-view">建立檢視</button><button class="outline" data-toast="示範設定已儲存">儲存變更</button></div></div><div class="panel table-panel"><div class="portfolio-table-heading"><select id="assessmentStatus"><option ${status==='已完成'?'selected':''}>已完成</option><option ${status==='全部'?'selected':''}>全部</option><option ${status==='進行中'?'selected':''}>進行中</option><option ${status==='草稿'?'selected':''}>草稿</option></select></div><div class="table-tools"><span>${rows.length} 筆</span><span class="spacer"></span><input id="assessmentSearch" value="${e(portfolioState.assessmentFilter)}" placeholder="搜尋評估" class="portfolio-search"><button data-toggle="fullscreen">⛶</button></div><div class="table-scroll"><table class="data-table"><thead><tr><th>評估名稱</th><th>公司</th><th>框架</th><th>狀態</th><th>完成日期 ↓</th><th>使用者</th><th>訂閱類型</th></tr></thead><tbody>${rows.map(r=>`<tr data-assessment-row><td class="name">${e(r[0])}</td>${r.slice(1).map(x=>`<td>${e(x)}</td>`).join('')}</tr>`).join('')}</tbody></table>${rows.length?'':'<div class="portfolio-empty"><span>⌕</span><p>找不到結果</p></div>'}</div><div class="pager"><button>30⌄</button><span>0 – ${rows.length}，共 ${rows.length} 筆</span><span class="spacer"></span><button>‹</button><span>${rows.length?'1 / 1':'0 / 0'}</span><button>›</button></div></div></div></div>`;
-}
-
 function criticalAssetsView(){
   const filters=[
     ['資產類型',['IP 位址','網域','Android','iOS']],
@@ -59,7 +47,7 @@ function comparePortfolioView(){
 }
 
 document.addEventListener('click',event=>{
-  const x=event.target.closest('[data-assets-upload],[data-assets-cancel],[data-assets-example],[data-assets-unmonitor],[data-compare-edit],[data-compare-hide],[data-compare-download],[data-compare-detail],[data-portfolio-filter],[data-assessment-clear],[data-assessment-row]');
+  const x=event.target.closest('[data-assets-upload],[data-assets-cancel],[data-assets-example],[data-assets-unmonitor],[data-compare-edit],[data-compare-hide],[data-compare-download],[data-compare-detail],[data-portfolio-filter]');
   if(!x)return;
   if(x.hasAttribute('data-assets-upload')){portfolioState.assetUploadOpen=true;render();return;}
   if(x.hasAttribute('data-assets-cancel')){portfolioState.assetUploadOpen=false;render();return;}
@@ -70,17 +58,11 @@ document.addEventListener('click',event=>{
   if(x.hasAttribute('data-compare-download')){const csv='公司,安全評等\n'+portfolioState.compareSelected.map(i=>`${companies[i][0]},${companies[i][1]}`).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='公司比較示範.csv';a.click();URL.revokeObjectURL(a.href);return;}
   if(x.hasAttribute('data-compare-detail')){state.selected=+x.dataset.compareDetail;render();return;}
   if(x.hasAttribute('data-portfolio-filter')){portfolioState.assetFilterOpen=portfolioState.assetFilterOpen===x.dataset.portfolioFilter?'':x.dataset.portfolioFilter;render();return;}
-  if(x.hasAttribute('data-assessment-clear')){portfolioState.assessmentStatus='全部';render();return;}
-  if(x.hasAttribute('data-assessment-row')){showToast('這是示範評估紀錄');return;}
 });
 document.addEventListener('change',event=>{
   const x=event.target;
-  if(x.id==='assessmentStatus'){portfolioState.assessmentStatus=x.value;render();return;}
   if(x.hasAttribute('data-compare-company')){const id=+x.dataset.compareCompany;if(x.checked&&portfolioState.compareSelected.length>=4){x.checked=false;showToast('最多比較 4 家公司');return;}portfolioState.compareSelected=x.checked?[...portfolioState.compareSelected,id]:portfolioState.compareSelected.filter(n=>n!==id);render();return;}
   if(x.hasAttribute('data-compare-vector')){portfolioState.compareVectors=x.checked?[...portfolioState.compareVectors,x.dataset.compareVector]:portfolioState.compareVectors.filter(n=>n!==x.dataset.compareVector);render();return;}
   if(x.hasAttribute('data-asset-filter-value')){const key=x.dataset.assetFilterValue;const old=portfolioState.assetFilters[key]||[];portfolioState.assetFilters[key]=x.checked?[...old,x.value]:old.filter(v=>v!==x.value);render();return;}
   if(x.id==='assetFile'&&x.files?.length){const file=x.files[0];const reader=new FileReader();reader.onload=()=>{const rows=String(reader.result).split(/\r?\n/).slice(1,21).filter(Boolean).map(line=>{const cols=line.split(',');return [cols[0]||'未命名資產',cols[1]||'網域',cols[2]||'示範公司',cols[3]||'中'];});portfolioState.assets=rows;portfolioState.assetUploadOpen=false;showToast(`已在本機讀取 ${rows.length} 筆資產`);};reader.readAsText(file);}
-});
-document.addEventListener('input',event=>{
-  if(event.target.id==='assessmentSearch'){portfolioState.assessmentFilter=event.target.value;const at=event.target.selectionStart;render();const field=document.getElementById('assessmentSearch');field.focus();field.setSelectionRange(at,at);}
 });
