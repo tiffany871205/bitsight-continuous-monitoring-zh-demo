@@ -1,10 +1,27 @@
-const portfolioState={assetFilters:{},assetFilterOpen:'',assetUploadOpen:false,assets:[],compareEditing:false,compareSelected:[1,3],compareHidden:[],compareVectors:[]};
+const portfolioState={expiredQuery:'',expiredFilter:'全部',assetFilters:{},assetFilterOpen:'',assetUploadOpen:false,assets:[],compareEditing:false,compareSelected:[1,3],compareHidden:[],compareVectors:[]};
 
 function portfolioView(page){
   if(page==='critical-assets')return criticalAssetsView();
   if(page==='compare')return comparePortfolioView();
-  return `${pagebar('到期訂閱')}<div class="expired-space" aria-label="目前未顯示到期訂閱內容"></div><div class="footer">獨立繁體中文操作範例 · 此頁依目前帳號可見的空白狀態重建</div>`;
+  return expiredSubscriptionsView();
 }
+
+const expiredSubscriptions=[
+  [1,'範例商業銀行','持續監控','2026/10/15','已到期','層級 1','供應商'],
+  [5,'範例電信公司','持續監控','2026/10/22','已到期','層級 1','供應商'],
+  [8,'範例證券集團','供應商選擇','2026/11/05','即將到期','層級 2','供應商'],
+  [10,'範例保險公司','持續監控','2026/11/18','即將到期','層級 2','供應商'],
+  [11,'範例雲端服務','持續監控','2026/12/01','即將到期','層級 2','供應商']
+];
+function expiredSubscriptionsView(){
+  const q=portfolioState.expiredQuery.trim().toLowerCase();
+  const filter=portfolioState.expiredFilter;
+  const rows=expiredSubscriptions.filter(r=>(filter==='全部'||r[4]===filter)&&(!q||r.slice(1).join(' ').toLowerCase().includes(q)));
+  const expired=expiredSubscriptions.filter(r=>r[4]==='已到期').length;
+  const upcoming=expiredSubscriptions.length-expired;
+  return `${pagebar('到期訂閱',`<button class="outline" data-expired-export>↓　匯出</button>`)}<div class="content portfolio-content expired-page"><section class="expired-summary"><div><small>已到期</small><b>${expired}</b><span>需要續訂或停止監控</span></div><div><small>30 天內到期</small><b>${upcoming}</b><span>請提前檢視訂閱</span></div><div><small>全部訂閱</small><b>${expiredSubscriptions.length}</b><span>目前清單中的公司</span></div></section><div class="companies-layout"><aside class="filters expired-filters"><div class="filter-top"><button class="active">▽ 篩選</button><button data-toast="已開啟檢視設定">♧</button></div><input class="filter-search" placeholder="搜尋篩選條件…" disabled><div class="filter-scroll"><div class="filter-row"><button>訂閱狀態 <span>⌃</span></button><div class="filter-options">${['全部','已到期','即將到期'].map(v=>`<label><input type="radio" name="expiredFilter" data-expired-filter value="${v}" ${filter===v?'checked':''}> ${v}</label>`).join('')}</div></div><div class="filter-row"><button>訂閱類型 <span>⌄</span></button></div><div class="filter-row"><button>層級 <span>⌄</span></button></div><div class="filter-row"><button>關係 <span>⌄</span></button></div><div class="filter-row"><button>到期日期 <span>⌄</span></button></div></div><button class="filter-bottom" data-toast="已建立到期訂閱檢視範例">建立檢視</button></aside><section class="panel table-panel"><div class="expired-table-tabs"><button class="${filter==='全部'?'active':''}" data-expired-tab="全部">全部</button><button class="${filter==='已到期'?'active':''}" data-expired-tab="已到期">已到期</button><button class="${filter==='即將到期'?'active':''}" data-expired-tab="即將到期">即將到期</button></div><div class="table-tools"><span>${rows.length} 家公司</span><span class="spacer"></span><input id="expiredSearch" class="portfolio-search" value="${e(portfolioState.expiredQuery)}" placeholder="搜尋公司…"><button data-expired-export title="下載 CSV">↓</button><button data-toggle="fullscreen" title="全螢幕">⛶</button></div><div class="table-scroll"><table class="data-table expired-table"><thead><tr><th><input type="checkbox" data-select-all></th><th>公司　↕</th><th>訂閱類型</th><th>到期日期　↑</th><th>狀態</th><th>層級</th><th>關係</th><th>動作</th></tr></thead><tbody>${rows.map(r=>`<tr><td><input type="checkbox" class="row-check"></td><td class="name" data-company="${r[0]}">▣　${e(r[1])}</td><td>${e(r[2])}</td><td>${e(r[3])}</td><td><span class="expired-status ${r[4]==='已到期'?'overdue':'upcoming'}">${e(r[4])}</span></td><td>${e(r[5])}</td><td>${e(r[6])}</td><td><button class="expired-action" data-toast="已開啟 ${e(r[1])} 的續訂流程">${r[4]==='已到期'?'續訂':'檢視'}</button></td></tr>`).join('')}</tbody></table>${rows.length?'':'<div class="portfolio-empty"><span>⌕</span><p>沒有符合條件的訂閱</p></div>'}</div><div class="pager"><button>30⌄</button><span>1 – ${rows.length}，共 ${rows.length} 筆</span><span class="spacer"></span><button>‹</button><span>1 / 1</span><button>›</button></div></section></div><div class="footer">獨立繁體中文操作範例 · 所有公司與日期均為示意資料</div></div>`;
+}
+
 function portfolioFilterOptions(label,opts,type){
   if(type==='number-range')return `<div class="filter-options portfolio-range-filter"><label>最小值<input type="number" min="0" inputmode="numeric" aria-label="${e(label)}最小值"></label><span>－</span><label>最大值<input type="number" min="0" inputmode="numeric" aria-label="${e(label)}最大值"></label></div>`;
   if(type==='date-range')return `<div class="filter-options portfolio-date-filter"><label>開始日期<input type="date" aria-label="${e(label)}開始日期"></label><label>結束日期<input type="date" aria-label="${e(label)}結束日期"></label></div>`;
@@ -47,8 +64,10 @@ function comparePortfolioView(){
 }
 
 document.addEventListener('click',event=>{
-  const x=event.target.closest('[data-assets-upload],[data-assets-cancel],[data-assets-example],[data-assets-unmonitor],[data-compare-edit],[data-compare-hide],[data-compare-download],[data-compare-detail],[data-portfolio-filter]');
+  const x=event.target.closest('[data-assets-upload],[data-assets-cancel],[data-assets-example],[data-assets-unmonitor],[data-compare-edit],[data-compare-hide],[data-compare-download],[data-compare-detail],[data-portfolio-filter],[data-expired-tab],[data-expired-export]');
   if(!x)return;
+  if(x.hasAttribute('data-expired-tab')){portfolioState.expiredFilter=x.dataset.expiredTab;render();return;}
+  if(x.hasAttribute('data-expired-export')){const csv='公司,訂閱類型,到期日期,狀態,層級,關係\n'+expiredSubscriptions.map(r=>r.slice(1).join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='到期訂閱.csv';a.click();URL.revokeObjectURL(a.href);return;}
   if(x.hasAttribute('data-assets-upload')){portfolioState.assetUploadOpen=true;render();return;}
   if(x.hasAttribute('data-assets-cancel')){portfolioState.assetUploadOpen=false;render();return;}
   if(x.hasAttribute('data-assets-example')){portfolioState.assets=[['portal.demo.example','網域','範例資訊服務','高'],['198.51.100.10','IP 位址','範例商業銀行','中']];portfolioState.assetUploadOpen=false;showToast('已載入兩筆虛構資產');return;}
@@ -61,8 +80,11 @@ document.addEventListener('click',event=>{
 });
 document.addEventListener('change',event=>{
   const x=event.target;
+  if(x.hasAttribute('data-expired-filter')){portfolioState.expiredFilter=x.value;render();return;}
   if(x.hasAttribute('data-compare-company')){const id=+x.dataset.compareCompany;if(x.checked&&portfolioState.compareSelected.length>=4){x.checked=false;showToast('最多比較 4 家公司');return;}portfolioState.compareSelected=x.checked?[...portfolioState.compareSelected,id]:portfolioState.compareSelected.filter(n=>n!==id);render();return;}
   if(x.hasAttribute('data-compare-vector')){portfolioState.compareVectors=x.checked?[...portfolioState.compareVectors,x.dataset.compareVector]:portfolioState.compareVectors.filter(n=>n!==x.dataset.compareVector);render();return;}
   if(x.hasAttribute('data-asset-filter-value')){const key=x.dataset.assetFilterValue;const old=portfolioState.assetFilters[key]||[];portfolioState.assetFilters[key]=x.checked?[...old,x.value]:old.filter(v=>v!==x.value);render();return;}
   if(x.id==='assetFile'&&x.files?.length){const file=x.files[0];const reader=new FileReader();reader.onload=()=>{const rows=String(reader.result).split(/\r?\n/).slice(1,21).filter(Boolean).map(line=>{const cols=line.split(',');return [cols[0]||'未命名資產',cols[1]||'網域',cols[2]||'示範公司',cols[3]||'中'];});portfolioState.assets=rows;portfolioState.assetUploadOpen=false;showToast(`已在本機讀取 ${rows.length} 筆資產`);};reader.readAsText(file);}
 });
+
+document.addEventListener('input',event=>{if(event.target.id==='expiredSearch'){portfolioState.expiredQuery=event.target.value;render();requestAnimationFrame(()=>{const el=document.getElementById('expiredSearch');el?.focus();el?.setSelectionRange(el.value.length,el.value.length);});}});
