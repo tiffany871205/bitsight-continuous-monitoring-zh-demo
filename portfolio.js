@@ -1,9 +1,25 @@
 const portfolioState={expiredQuery:'',expiredInactive:true,expiredMenu:-1,assetFilters:{},assetFilterOpen:'',assetUploadOpen:false,assets:[],compareEditing:false,compareSelected:[1,3],compareHidden:[],compareVectors:[]};
 
 function portfolioView(page){
+  if(page==='portfolio-assessments')return portfolioAssessmentsView();
   if(page==='critical-assets')return criticalAssetsView();
+  if(page==='risk-analytics')return riskAnalyticsView();
   if(page==='compare')return comparePortfolioView();
   return expiredSubscriptionsView();
+}
+
+function portfolioAssessmentsView(){
+  const rows=[
+    ['ISO_27001_2022_09/18/2025','範例資訊科技公司','ISO 27001:2022','已完成','2025/09/18','範例使用者','—',['2%','2%','96%']],
+    ['ISO_27001_2022_09/18/2025_2','範例資訊科技公司','ISO 27001:2022','已完成','2025/09/18','範例使用者','—',['0%','9%','91%']]
+  ];
+  const filters=['公司','狀態','使用者','日期','框架'];
+  return `${pagebar('框架情報評估')}<div class="assessment-layout portfolio-fi-page"><aside class="fi-filter"><div class="filter-top"><button class="active">▽ 篩選</button><button>▥</button><button>♧</button><span>‹</span></div><input placeholder="搜尋篩選條件…"><div class="active-filter-head"><b>使用中的篩選</b><button data-toast="已清除示範篩選">清除全部</button></div><div class="active-chips"><span>已完成　×</span></div><div class="assessment-filter-scroll filter-scroll">${filters.map((x,i)=>`<div class="assessment-filter-group"><button class="finding-filter-row" data-portfolio-filter="${x}">${x}${i===1?'<em>1 ×</em>':''}<span>⌄</span></button></div>`).join('')}</div><div class="finding-filter-foot"><button data-modal="create-view">建立檢視</button></div></aside><main class="assessment-results panel"><div class="portfolio-fi-chip">已完成的評估 ●</div><div class="table-tools"><span>2 列</span><span class="spacer"></span><button title="搜尋">⌕</button><button title="全螢幕">⛶</button></div><div class="assessment-table-scroll"><table class="data-table portfolio-fi-table"><thead><tr><th>評估名稱</th><th>公司</th><th>框架</th><th>狀態</th><th>完成日期 ↓</th><th>使用者</th><th>訂閱類型</th><th>合規情形</th></tr></thead><tbody>${rows.map((r,i)=>`<tr data-toast="已開啟「${r[0]}」評估詳細資料"><td class="name">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td>${r[6]}</td><td><div class="fi-compliance"><span style="width:${r[7][0]}"></span><span style="width:${r[7][1]}"></span><span style="width:${r[7][2]}"></span></div><small>${r[7].join('　')}</small></td></tr>`).join('')}</tbody></table></div><div class="pager"><button>30⌄</button><span>1 - 2，共 2 筆</span><span class="spacer"></span><button disabled>上一頁</button><span>1 / 1</span><button disabled>下一頁</button></div></main></div>`;
+}
+
+function riskAnalyticsView(){
+  const overview=(title,multiple,bands)=>`<section class="panel risk-analytics-card"><div class="ra-card-head"><div><h2>${title}</h2><p>目前供應商之風險升高概況</p></div><div class="ra-legend"><span>基準</span><span>1.1x</span><span>1.5x</span><span>3.2x</span><span>4.8x</span></div></div><div class="ra-overview"><div><h3>今日檢視</h3><div class="ra-stacked">${bands.map((x,i)=>`<i style="width:${x}%;opacity:${.3+i*.17}">${x}%</i>`).join('')}</div><small>未分層</small></div><div class="ra-history-stats"><small>最高升高風險</small><strong>${multiple}</strong><b>▼ 較差</b><p>去年：1.1x<br>目前：${multiple}</p><small>整體升高風險</small><strong>33%</strong><b>▼ 較差</b></div><div class="ra-area"><h3>歷史檢視</h3><svg viewBox="0 0 520 180" preserveAspectRatio="none"><path d="M0 145 L55 145 L100 165 L145 165 L190 145 L245 145 L300 145 L355 145 L410 145 L455 110 L520 150 L520 180 L0 180Z" fill="#ef6a58" opacity=".75"/><path d="M0 115 L55 115 L100 145 L145 145 L190 115 L245 115 L300 115 L355 115 L410 115 L455 75 L520 115 L520 180 L0 180Z" fill="#f5b0a7" opacity=".75"/></svg><div class="ra-months">11月　12月　1月　2月　3月　4月　5月　6月　7月　8月　9月　10月</div></div></div></section>`;
+  return `${pagebar('風險分析　ⓘ','<button class="outline" data-toast="風險分析資料已準備下載">下載</button>')}<main class="risk-analytics-page"><div class="ra-summary"><section class="ra-rating"><small>投資組合平均評等</small><strong>740</strong><span>▼　較上月 -30 分</span></section><section class="panel"><h3>資安事件</h3><strong>17%</strong><p>您的投資組合處於最高升高風險。這些公司發生資安事件的可能性是評等 750+ 公司的 3.2 倍。</p></section><section class="panel"><h3>勒索軟體</h3><strong>17%</strong><p>您的投資組合處於最高升高風險。這些公司發生勒索軟體事件的可能性是評等 750+ 公司的 4.6 倍。</p></section></div>${overview('資安事件概況','3.2x',[67,17,17])}${overview('勒索軟體事件概況','4.6x',[67,17,17])}<section class="panel risk-analytics-card"><h2>風險面向概況</h2><p>12 個會提高資安事件風險的風險面向分布</p><div class="ra-vector-bars">${[['重大弱點管理',100],['桌面軟體',17],['可能遭到利用',83],['行動軟體',100],['殭屍網路感染',50],['不安全系統',83],['檔案分享',100],['TLS/SSL 設定',50],['開放連接埠',83],['TLS/SSL 憑證',100],['垃圾郵件傳播',17],['未經請求的通訊',50]].map(([n,v])=>`<div><i style="height:${v}%"></i><b>${v}%</b><span>${n}</span></div>`).join('')}</div></section></main>`;
 }
 
 const expiredSubscriptions=[
